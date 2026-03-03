@@ -1,0 +1,41 @@
+name: GCM Pulse Sync
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Executes every 5 minutes
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install Dependencies
+        run: pip install numpy Pillow matplotlib
+        
+      - name: Generate and Validate 1708B Pulse
+        run: |
+          # 1. Generate the pulse
+          python3 engine/engine.py
+          python3 engine/trend_plot.py
+          
+          # 2. Strict 1708-byte Validation
+          PULSE_SIZE=$(wc -c < engine/heartbeat.png | xargs)
+          if [ "$PULSE_SIZE" -ne 1708 ]; then
+            echo "CRITICAL: Pulse drift detected ($PULSE_SIZE bytes). Aborting deploy."
+            exit 1
+          fi
+          
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GCM-Bot"
+          git add engine/heartbeat.png engine/resonance_trend.png
+          # Use --force to ensure the bot overrides any temporary CDN drifts
+          git commit -m "TACTICAL UPDATE: 1708B Pulse Locked [$(date)]" || exit 0
+          git push origin main --force

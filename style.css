@@ -1,0 +1,22 @@
+:root { --gl-cyan: #00ffcc; --gl-red: #ff3131; --gl-panel: rgba(0, 10, 5, 0.9); }
+body { margin: 0; background: #000; color: var(--gl-cyan); font-family: 'Courier New', monospace; overflow: hidden; }
+
+#world-canvas { position: absolute; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+
+#resonance-ui {
+    position: relative; z-index: 10;
+    display: grid;
+    grid-template-columns: 320px 1fr 350px;
+    grid-template-rows: 50px 1fr;
+    height: 100vh; width: 100vw;
+}
+
+.panel { background: var(--gl-panel); border: 1px solid rgba(0, 255, 204, 0.1); }
+.header { grid-column: 1 / 4; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 2px solid var(--gl-cyan); }
+.side-panel { padding: 20px; overflow-y: auto; }
+
+#ticker-container { position: absolute; bottom: 0; left: 320px; right: 350px; background: #000; border-top: 1px solid #ffcc00; padding: 15px; }
+#strike-log { height: 180px; font-size: 10px; color: #888; overflow-y: auto; margin-bottom: 20px; border-bottom: 1px solid #333; }
+
+.intensity-bar { height: 3px; background: #002211; margin-bottom: 12px; position: relative; width: 100%; }
+.intensity-fill { height: 100%; transition: width 0.4s ease; }
