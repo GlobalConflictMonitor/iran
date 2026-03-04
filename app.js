@@ -22,6 +22,20 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 15, 35); 
 
+// --- SPATIAL MATRIX RESIZE PROTOCOL ---
+window.addEventListener('resize', () => {
+    // Recalculate Frustum / Aspect Ratio
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    
+    // Force WebGL & CSS2D to match strict viewport bounds
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+// Force an immediate projection sync to catch initial DOM layout lag
+window.dispatchEvent(new Event('resize'));
+// --------------------------------------
+
 const controls = new OrbitControls(camera, labelRenderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;

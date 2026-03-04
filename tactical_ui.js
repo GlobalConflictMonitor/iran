@@ -14,7 +14,7 @@ export const TacticalUI = {
         const colorMain = isCritical ? '#ff4d4d' : '#00ffaa';
         const colorSigma = sigma < 0.5 ? '#ff4d4d' : '#00ffaa';
 
-        // Strict DOM Node Generation (XSS Mitigation)
+        // --- STRICT DOM NODE GENERATION (XSS MITIGATED) ---
         const entry = document.createElement('div');
         entry.className = 'audit-entry';
         entry.style.cssText = `border-left: 2px solid ${colorMain}; padding-left: 10px; background: rgba(0,0,0,0.4); padding-bottom: 5px;`;
@@ -33,25 +33,42 @@ export const TacticalUI = {
         headerRow.appendChild(nodeSpan);
         headerRow.appendChild(sigmaSpan);
 
+        // Secured Resonance Row
         const resRow = document.createElement('div');
         resRow.style.cssText = 'margin: 4px 0; font-size: 0.9em; color: #aaa;';
-        resRow.innerHTML = `RESONANCE: <span style="color: #fff; font-weight: bold;">${normPercent}%</span> <span style="color: ${colorMain}; font-size: 0.8em;">[${status}]</span>`;
+        
+        const resLabelText = document.createTextNode('RESONANCE: ');
+        const percentSpan = document.createElement('span');
+        percentSpan.style.cssText = 'color: #fff; font-weight: bold;';
+        percentSpan.textContent = `${normPercent}% `;
+        
+        const statusSpan = document.createElement('span');
+        statusSpan.style.cssText = `color: ${colorMain}; font-size: 0.8em;`;
+        statusSpan.textContent = `[${status}]`;
+        
+        resRow.appendChild(resLabelText);
+        resRow.appendChild(percentSpan);
+        resRow.appendChild(statusSpan);
 
+        // Secured Decode Row
         const decodeRow = document.createElement('div');
         decodeRow.style.cssText = 'margin: 6px 0; font-size: 0.85em; color: #00ffaa;';
-        decodeRow.textContent = `DECODE: ${dimTag}`; // XSS Neutralized
+        decodeRow.textContent = `DECODE: ${dimTag}`;
 
+        // Secured Hash Row
         const hashRow = document.createElement('div');
-        hashRow.style.cssText = 'font-size: 0.7em; opacity: 0.6; margin-top: 4px;';
-        hashRow.textContent = `HASH: ${hash}`; // XSS Neutralized
-        hashRow.style.color = '#ffaa00';
+        hashRow.style.cssText = 'font-size: 0.7em; opacity: 0.6; margin-top: 4px; color: #ffaa00;';
+        hashRow.textContent = `HASH: ${hash}`; 
 
         entry.appendChild(headerRow);
         entry.appendChild(resRow);
         entry.appendChild(decodeRow);
         entry.appendChild(hashRow);
 
-        log.innerHTML = ''; // Clear previous securely
+        // Safe DOM Replacement
+        while (log.firstChild) {
+            log.removeChild(log.firstChild);
+        }
         log.appendChild(entry);
     },
 
@@ -70,7 +87,7 @@ export const TacticalUI = {
         
         const tagSpan = document.createElement('span');
         tagSpan.style.cssText = 'color:#aaa; font-size:0.9em;';
-        tagSpan.textContent = tag; // XSS Neutralized
+        tagSpan.textContent = tag; 
         
         entry.appendChild(title);
         entry.appendChild(document.createElement('br'));

@@ -2,20 +2,40 @@ body.gcm-os-theme {
     background-color: #000; color: #00ffaa; font-family: 'Courier New', Courier, monospace;
     margin: 0; overflow: hidden;
 }
+
 body.gcm-os-theme::before {
     content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                 linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
     z-index: 200; background-size: 100% 2px, 3px 100%; pointer-events: none;
 }
-#world-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
-#css2d-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; }
+
+/* Strict Viewport Bounds */
+#world-canvas, #css2d-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: block;
+}
+
+#world-canvas {
+    z-index: 1; 
+    pointer-events: auto; /* Required for THREE.Raycaster interaction */
+}
+
+#css2d-canvas {
+    z-index: 10; 
+    pointer-events: none; /* Allows clicks to pass through to the WebGL layer */
+}
+
 #resonance-ui { position: relative; z-index: 100; pointer-events: none; height: 100vh; display: flex; flex-direction: column; }
 
 .panel { background: rgba(0, 20, 15, 0.85); border: 1px solid #00ffaa; box-shadow: 0 0 15px rgba(0, 255, 170, 0.2); pointer-events: auto; margin: 10px; padding: 10px; }
 .header { display: flex; justify-content: space-between; align-items: center; }
 
-/* New UI Elements */
+/* Dynamic Topology UI Elements */
 .node-label { color: #00ffaa; font-size: 11px; text-shadow: 0 0 5px #000; background: rgba(0,0,0,0.6); padding: 2px 4px; border: 1px solid #00ffaa; border-radius: 2px; }
 #alert-ledger { position: absolute; right: 20px; top: 80px; width: 280px; z-index: 100; pointer-events: none; }
 .alert-entry { border-left: 2px solid #ff4d4d; background: rgba(20, 0, 0, 0.85); color: #fff; padding: 8px; margin-bottom: 5px; font-size: 0.85em; animation: fadein 0.3s; box-shadow: 0 0 10px rgba(255, 77, 77, 0.2); }
