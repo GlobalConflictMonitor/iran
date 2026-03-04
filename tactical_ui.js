@@ -10,32 +10,73 @@ export const TacticalUI = {
         else if (value > 140) status = "ELEVATED_FRICTION";
         else if (value < 60) status = "SUPPRESSED";
 
-        log.innerHTML = `
-            <div class="audit-entry" style="border-left: 2px solid ${value > 200 ? '#ff4d4d' : '#00ffaa'}; padding-left: 10px; background: rgba(0,0,0,0.4); padding-bottom: 5px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 3px;">
-                    <span style="font-weight: bold; color: #fff;">NODE: V_${dimIndex}</span>
-                    <span style="color: ${sigma < 0.5 ? '#ff4d4d' : '#00ffaa'}">σ: ${sigma}</span>
-                </div>
-                <div style="margin: 4px 0; font-size: 0.9em; color: #aaa;">
-                    RESONANCE: <span style="color: #fff; font-weight: bold;">${normPercent}%</span> 
-                    <span style="color: ${value > 200 ? '#ff4d4d' : '#00ffaa'}; font-size: 0.8em;">[${status}]</span>
-                </div>
-                <div style="margin: 6px 0; font-size: 0.85em; color: #00ffaa;">
-                    DECODE: ${dimTag}
-                </div>
-                <div style="font-size: 0.7em; opacity: 0.6; margin-top: 4px;">
-                    HASH: <span style="color: #ffaa00;">${hash}</span>
-                </div>
-            </div>
-        `;
+        const isCritical = value > 200;
+        const colorMain = isCritical ? '#ff4d4d' : '#00ffaa';
+        const colorSigma = sigma < 0.5 ? '#ff4d4d' : '#00ffaa';
+
+        // Strict DOM Node Generation (XSS Mitigation)
+        const entry = document.createElement('div');
+        entry.className = 'audit-entry';
+        entry.style.cssText = `border-left: 2px solid ${colorMain}; padding-left: 10px; background: rgba(0,0,0,0.4); padding-bottom: 5px;`;
+
+        const headerRow = document.createElement('div');
+        headerRow.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 3px;';
+        
+        const nodeSpan = document.createElement('span');
+        nodeSpan.style.cssText = 'font-weight: bold; color: #fff;';
+        nodeSpan.textContent = `NODE: V_${dimIndex}`;
+        
+        const sigmaSpan = document.createElement('span');
+        sigmaSpan.style.color = colorSigma;
+        sigmaSpan.textContent = `σ: ${sigma}`;
+        
+        headerRow.appendChild(nodeSpan);
+        headerRow.appendChild(sigmaSpan);
+
+        const resRow = document.createElement('div');
+        resRow.style.cssText = 'margin: 4px 0; font-size: 0.9em; color: #aaa;';
+        resRow.innerHTML = `RESONANCE: <span style="color: #fff; font-weight: bold;">${normPercent}%</span> <span style="color: ${colorMain}; font-size: 0.8em;">[${status}]</span>`;
+
+        const decodeRow = document.createElement('div');
+        decodeRow.style.cssText = 'margin: 6px 0; font-size: 0.85em; color: #00ffaa;';
+        decodeRow.textContent = `DECODE: ${dimTag}`; // XSS Neutralized
+
+        const hashRow = document.createElement('div');
+        hashRow.style.cssText = 'font-size: 0.7em; opacity: 0.6; margin-top: 4px;';
+        hashRow.textContent = `HASH: ${hash}`; // XSS Neutralized
+        hashRow.style.color = '#ffaa00';
+
+        entry.appendChild(headerRow);
+        entry.appendChild(resRow);
+        entry.appendChild(decodeRow);
+        entry.appendChild(hashRow);
+
+        log.innerHTML = ''; // Clear previous securely
+        log.appendChild(entry);
     },
 
     triggerAlert: (dimIndex, delta, tag) => {
         const ledger = document.getElementById('alert-ledger');
         if (!ledger) return;
+        
         const entry = document.createElement('div');
         entry.className = 'alert-entry';
-        entry.innerHTML = `<strong>V_${dimIndex} VOLATILITY SPIKE</strong><br>ΔV/dt = +${delta.toFixed(0)}<br><span style="color:#aaa; font-size:0.9em;">${tag}</span>`;
+        
+        const title = document.createElement('strong');
+        title.textContent = `V_${dimIndex} VOLATILITY SPIKE`;
+        
+        const metric = document.createElement('div');
+        metric.textContent = `ΔV/dt = +${delta.toFixed(0)}`;
+        
+        const tagSpan = document.createElement('span');
+        tagSpan.style.cssText = 'color:#aaa; font-size:0.9em;';
+        tagSpan.textContent = tag; // XSS Neutralized
+        
+        entry.appendChild(title);
+        entry.appendChild(document.createElement('br'));
+        entry.appendChild(metric);
+        entry.appendChild(tagSpan);
+        
         ledger.prepend(entry);
         if (ledger.children.length > 5) ledger.removeChild(ledger.lastChild);
     }

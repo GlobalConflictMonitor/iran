@@ -22,13 +22,13 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 15, 35); 
 
-const controls = new OrbitControls(camera, labelRenderer.domElement); // Bind to CSS canvas to allow clicking
+const controls = new OrbitControls(camera, labelRenderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.maxPolarAngle = Math.PI / 2 - 0.05; 
 controls.minDistance = 10;
 controls.maxDistance = 150;
-controls.autoRotate = false; // Controlled by Boot Sequence initially
+controls.autoRotate = false; 
 
 const gridHelper = new THREE.GridHelper(60, 60, 0x00ffaa, 0x003311);
 scene.add(gridHelper);
@@ -96,10 +96,18 @@ const GCM_OS = {
     init: async function() {
         const intel = await PulseDecoder.extractMeta('./heartbeat.png');
         if (intel && !this.isPlayback) {
-            const sigma = intel.sigmaVector.map(v => (v / 255).toFixed(2));
-            if (window.AuditPersistence) AuditPersistence.push(intel.rawVector, intel.metadata, sigma);
+            // Strict IEEE 754 floating-point casting for the Sonifier Node
+            const sigma = intel.sigmaVector.map(v => parseFloat((v / 255).toFixed(2)));
+            
+            // Correct ES6 Scope Resolution
+            if (typeof AuditPersistence !== 'undefined') {
+                AuditPersistence.push(intel.rawVector, intel.metadata, sigma);
+            }
             this.sync(intel.rawVector, intel.metadata, sigma);
-            TemporalScrubber.updateTimeDisplay(null); // Live stream
+            
+            if (typeof TemporalScrubber !== 'undefined') {
+                TemporalScrubber.updateTimeDisplay(null); // Live stream
+            }
         }
     },
 
@@ -126,6 +134,14 @@ const GCM_OS = {
             scene.add(ghost);
             ghostTrails.push(ghost);
         });
+
+        // OOM Protection: Hard cap the WebGL geometry array
+        while (ghostTrails.length > 64) {
+            const staleGhost = ghostTrails.shift();
+            scene.remove(staleGhost);
+            staleGhost.material.dispose();
+            staleGhost.geometry.dispose(); 
+        }
 
         this.targetHeights = vector.map(v => Math.max(0.1, (v / 255) * 15));
         const energyNorm = vector[12] / 255.0;
@@ -223,7 +239,8 @@ window.onload = () => {
     GCM_OS.init();
     setInterval(() => GCM_OS.init(), 5000);
     
-    if (window.TemporalScrubber) {
+    // Correct ES6 Reference
+    if (typeof TemporalScrubber !== 'undefined') {
         TemporalScrubber.init((index) => {
             if (BootSys.active) return; // Prevent scrubbing during boot
             
