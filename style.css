@@ -43,3 +43,17 @@ body.gcm-os-theme::before {
 #scrubber-time { font-size: 0.8em; color: #ffaa00; margin-left: 15px; }
 
 @keyframes fadein { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* Intelligence Feed Interactions */
+.news-link:hover {
+    background: rgba(0, 255, 170, 0.1);
+    color: #00ffaa !important;
+}
+
+#news-feed-target::-webkit-scrollbar {
+    width: 4px;
+}
+
+#news-feed-target::-webkit-scrollbar-thumb {
+    background: #00ffaa;
+}
