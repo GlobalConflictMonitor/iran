@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GCM // TACTICAL COMMAND 2026</title>
+    <link rel="stylesheet" href="style.css?v=1772571113">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body class="gcm-os-theme">
+    <canvas id="world-canvas"></canvas>
+    <div id="css2d-canvas"></div>
+    
+    <div id="boot-screen">
+        <h2 id="boot-text">INITIALIZING MANIFOLD...</h2>
+    </div>
+
+    <div id="alert-ledger"></div>
+
+    <div id="resonance-ui">
+        <header class="panel header">
+            <div class="brand">GCM // TACTICAL COMMAND</div>
+            <div style="display: flex; align-items: center;">
+                <div id="scrubber-container"></div>
+                <div id="scrubber-time">LIVE STREAM</div>
+            </div>
+            <div id="system-clock">00:00:00 UTC</div>
+        </header>
+        <aside class="panel side-panel" style="width: 320px;">
+            <h4>STRIKE LOG // BLACK BOX</h4>
+            <div id="audit-log-container">
+                <div style="opacity: 0.5; font-size: 0.8em;">AWAITING MANUAL DIMENSION ISOLATION...</div>
+            </div>
+        </aside>
+    </div>
+    <script type="module" src="app.js?v=1772571113"></script>
+</body>
+</html>
